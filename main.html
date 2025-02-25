@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire Birthday - Gowtham Reddy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Bungee', cursive;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header {
+            position: relative;
+            padding: 2rem;
+            background: rgba(0,0,0,0.7);
+            border: 3px solid #ff4655;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+        }
+
+        .ff-logo {
+            width: 300px;
+            margin: -60px auto 0;
+            filter: drop-shadow(0 0 15px #ff4655);
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: #ff4655;
+            text-shadow: 0 0 15px rgba(255,70,85,0.5);
+            margin: 1rem 0;
+            font-size: 2.5rem;
+        }
+
+        .character-card {
+            width: 300px;
+            height: 400px;
+            margin: 2rem auto;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .character-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .character-card:hover .character-inner {
+            transform: rotateY(180deg);
+        }
+
+        .character-front, .character-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: #1a1a1a;
+            border: 3px solid #ff4655;
+            padding: 1rem;
+            border-radius: 15px;
+        }
+
+        .character-back {
+            transform: rotateY(180deg);
+            background: #000;
+        }
+
+        .character-image {
+            width: 100%;
+            height: 70%;
+            object-fit: cover;
+            border-bottom: 3px solid #ff4655;
+            border-radius: 10px;
+        }
+
+        .birthday-message {
+            background: rgba(0,0,0,0.7);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-left: 5px solid #ff4655;
+            text-align: left;
+            position: relative;
+            border-radius: 10px;
+        }
+
+        .grenade-button {
+            background: #ff4655;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Press Start 2P';
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .grenade-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #ff4655;
+        }
+
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: rgba(0,0,0,0.7);
+            padding: 1.5rem;
+            border: 2px solid #ff4655;
+            border-radius: 10px;
+        }
+
+        .bullet-hole {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MjlBQjM1RUM3NEE1MTFFNEI4NDhGM0JDRDk2MDg4MzgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MjlBQjM1RUQ3NEE1MTFFNEI4NDhGM0JDRDk2MDg4MzgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoyOUFCMzVFQTc0QTUxMUU0Qjg0OEYzQkNENTYwODgzOCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoyOUFCMzVFQjc0QTUxMUU0Qjg0OEYzQkNENTYwODgzOCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PhZ+5z0AAAA8SURBVHjaYvz//z8DOYCJgUxA4gQmEmEMhhlA/I8YzUQh8I9IzUSVZiZyNZNlA6UaKKOAAAMAd1IC1kw+Lf0AAAAASUVORK5CYII=');
+            background-size: cover;
+            animation: holeAppear 0.5s;
+        }
+
+        @keyframes holeAppear {
+            0% { transform: scale(0); }
+            90% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .weapon-showcase {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .weapon-card {
+            width: 100px;
+            height: 100px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #ff4655;
+            border-radius: 10px;
+            padding: 0.5rem;
+        }
+
+        .weapon-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <img src="freefire.gif"width = "500" height = "200">
+                             <h1>HAPPY BIRTHDAY PRO PLAYER</h1>
+            <h2 style="color: #fff;">GOWTHAM REDDY</h2>
+        </header>
+
+        <div class="character-card">
+            <div class="character-inner">
+                <div class="character-front">
+                    <img src="gowtham.jpg"
+                         alt="Gowtham" 
+                         class="character-image">
+                    <div class="game-stats">
+                        <div class="stat-card">
+                            <h3>🏆 Wins</h3>
+                            <p>560</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>🎯 K/D Ratio</h3>
+                            <p>5.6</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="character-back">
+                    <h3 style="color: #ff4655;">COMBAT STATS</h3>
+                    <p>🔥 Headshots: 86%</p>
+                    <p>🏃 Avg Movement: 5.2km</p>
+                    <p>💣 Grenade Kills: 150</p>
+                    <p>🛡️ Damage Blocked: 1.2M</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="weapon-showcase">
+            <div class="weapon-card">
+                <img src="mp5.jpg" alt="AK47">
+            </div>
+            <div class="weapon-card">
+                <img src="ak.jpg" alt="Shotgun">
+            </div>
+            <div class="weapon-card">
+                <img src="mp40.jpg" alt="Grenade">
+            </div>
+        </div>
+
+        <div class="birthday-message">
+            <h3>🎉 BIRTHDAY MISSION BRIEFING:</h3>
+            <p>> Mission: CELEBRATE And Be Happy!</p>
+            <p>> REWARDS: UNLIMITED JOY & SUCCESS</p>
+            <p>> LOOT: CAKE, GIFTS & MEMORIES</p>
+            <p>> MAP: PARTY ZONE</p>
+        </div>
+
+        <button class="grenade-button" onclick="throwGrenade()">
+            🎉 LAUNCH BIRTHDAY ATTACK
+        </button>
+    </div>
+
+    <script>
+        function throwGrenade() {
+            // Confetti explosion
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#ff4655', '#ffffff', '#ffd700'],
+                startVelocity: 30
+            });
+
+            // Create bullet holes
+            for(let i = 0; i < 25; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'bullet-hole';
+                hole.style.left = Math.random() * window.innerWidth + 'px';
+                hole.style.top = Math.random() * window.innerHeight + 'px';
+                document.body.appendChild(hole);
+                setTimeout(() => hole.remove(), 5000);
+            }
+
+            // Screen shake effect
+            gsap.to(window, {
+                duration: 0.1,
+                repeat: 5,
+                onRepeat: () => {
+                    gsap.set(document.body, {
+                        x: gsap.utils.random(-10, 10),
+                        y: gsap.utils.random(-10, 10)
+                    });
+                },
+                onComplete: () => {
+                    gsap.set(document.body, { x: 0, y: 0 });
+                }
+            });
+        }
+
+        // Initial animations
+        gsap.from(".header", { duration: 1, y: -100, opacity: 0 });
+        gsap.from(".character-card", { duration: 1, scale: 0, rotation: 360 });
+        gsap.from(".weapon-card", {
+            duration: 1,
+            x: -100,
+            opacity: 0,
+            stagger: 0.2
+        });
+    </script>
+</body>
+</html>
